@@ -95,6 +95,7 @@ RUN \
       && ln -fs "/var/lib/snipeit/keys/oauth-public.key" "/var/www/html/storage/oauth-public.key" \
       && chown docker "/var/lib/snipeit/keys/" \
       && chmod +x /var/www/html/artisan \
+      && mkdir "/var/www/temp" && chown docker "/var/www/temp" \
       && echo "Finished setting up application in /var/www/html"
 
 ############## DEPENDENCIES via COMPOSER ###################
@@ -104,6 +105,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Get dependencies
 USER docker
+#RUN composer update --no-dev --working-dir=/var/www/html
 RUN composer install --no-dev --working-dir=/var/www/html
 USER root
 

@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+use PDF;
+
 class BulkAssetsController extends Controller
 {
     use CheckInOutRequest;
@@ -37,10 +39,19 @@ class BulkAssetsController extends Controller
         if ($request->filled('bulk_actions')) {
             switch($request->input('bulk_actions')) {
                 case 'labels':
-                    return view('hardware/labels')
-                        ->with('assets', Asset::find($asset_ids))
-                        ->with('settings', Setting::getSettings())
-                        ->with('count', 0);
+                $pdf = PDF::loadView('hardware/labels-pdf',
+	                    array('assets' => Asset::find($asset_ids),
+	                        'settings' => Setting::getSettings()),
+	                        [],
+	                        [
+	                            'margin_top' => 0,
+	                            'margin_bottom' => 0,
+	                            'margin_left' => 0,
+	                            'margin_right' => 0,
+	                            'margin_header' => 0,
+	                            'margin_footer' => 0
+	                        ]);
+	                return $pdf->stream('label.pdf');
                 case 'delete':
                     $assets = Asset::with('assignedTo', 'location')->find($asset_ids);
                     $assets->each(function ($asset) {

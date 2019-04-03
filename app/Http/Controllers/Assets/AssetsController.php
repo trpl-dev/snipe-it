@@ -23,6 +23,7 @@ use Input;
 use League\Csv\Reader;
 use League\Csv\Statement;
 use Paginator;
+use PDF;
 use Redirect;
 use Response;
 use Slack;

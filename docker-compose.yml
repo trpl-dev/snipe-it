@@ -1,0 +1,54 @@
+version: '3.7'
+services:
+  snipe:
+    image: plgabw/snipeit:dev
+    ports: 
+      - 80:80
+    environment:
+      - APP_ENV=developement
+      - APP_DEBUG=true
+      - DB_CONNECTION=mysql
+      - DB_HOST=snipedb
+      - DB_DATABASE=snipe
+      - DB_USERNAME=snipe
+      - DB_PASSWORD=snipeuserpass
+      - APP_KEY=base64:5U/KPKw1GN/Rz0fWYO/4FsSOqjmjvDAQzMCqwcAqstc=
+    depends_on: 
+      - snipedb
+    links: 
+      - snipedb:snipedb
+    volumes: 
+      - type: volume
+        source: snipe-vol
+        target: /var/lib/snipeit
+  snipedb:
+    image: mysql:5.6
+    ports: 
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=snipe
+      - MYSQL_USER=snipe
+      - MYSQL_PASSWORD=snipeuserpass
+    volumes: 
+      - type: volume
+        source: snipesql-vol
+        target: /var/lib/mysql
+  mysqladmin:
+    image: phpmyadmin/phpmyadmin
+    links: 
+      - snipedb:snipedb
+    ports: 
+      - 8080:80
+    container_name: phpmyadmin
+    environment:
+     - PMA_ARBITRARY=1
+    restart: always
+    volumes:
+     - type: volume
+       source: snipesqladmin-vol
+       target: /sessions
+volumes:
+  snipe-vol:
+  snipesql-vol:
+  snipesqladmin-vol:
