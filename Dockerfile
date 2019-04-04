@@ -70,6 +70,7 @@ RUN \
       && ln -fs "/var/lib/snipeit/keys/oauth-public.key" "/var/www/html/storage/oauth-public.key" \
       && chown docker "/var/lib/snipeit/keys/" \
       && chmod +x /var/www/html/artisan \
+      && mkdir "/var/www/temp" && chown docker "/var/www/temp" \
       && echo "Finished setting up application in /var/www/html"
 
 ############## DEPENDENCIES via COMPOSER ###################
@@ -79,7 +80,7 @@ RUN cd /tmp;curl -sS https://getcomposer.org/installer | php;mv /tmp/composer.ph
 
 # Get dependencies
 USER docker
-RUN cd /var/www/html;composer install && rm -rf /home/docker/.composer/cache
+RUN cd /var/www/html;composer update && rm -rf /home/docker/.composer/cache
 USER root
 
 ############### APPLICATION INSTALL/INIT #################

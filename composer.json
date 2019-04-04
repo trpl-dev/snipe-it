@@ -36,7 +36,8 @@
     "tecnickcom/tc-lib-barcode": "^1.15",
     "tightenco/ziggy": "^0.4.1",
     "unicodeveloper/laravel-password": "^1.0",
-    "watson/validating": "^3.0"
+    "watson/validating": "^3.0",
+    "niklasravnsborg/laravel-pdf": "^2.0"
   },
     "require-dev": {
     "codeception/codeception": "2.3.6",

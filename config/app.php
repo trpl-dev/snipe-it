@@ -314,6 +314,7 @@ return [
         * Custom service provider
         */
         App\Providers\MacroServiceProvider::class,
+        niklasravnsborg\LaravelPdf\PdfServiceProvider::class,
 
 
     ],
@@ -370,6 +371,7 @@ return [
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
         'Image'     => Intervention\Image\ImageManagerStatic::class,
         'Carbon' => Carbon\Carbon::class,
+        'PDF' => niklasravnsborg\LaravelPdf\Facades\Pdf::class,
 
 
     ],
