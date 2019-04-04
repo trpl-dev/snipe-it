@@ -1,0 +1,30 @@
+mkdir snipe-it-dev
+git clone https://github.com/snipe/snipe-it snipe-it-dev
+cd snipe-it-dev
+git checkout develop
+git remote rename origin upstream
+git remote set-url origin https://trpl-dev@github.com/trpl-dev/snipe-it.git
+git remote add origin https://github.com/trpl-dev/snipe-it
+git checkout -b origin/develop
+curl -sS https://getcomposer.org/installer | php
+php composer.phar install --prefer-source
+git push origin develop
+
+#change Dockerfile
+#RUN composer install --no-dev --working-dir=/var/www/html
+#to
+#RUN composer update --no-dev --working-dir=/var/www/html
+
+
+RUN \
+	rm -r "/var/www/html/storage/private_uploads" && ln -fs "/var/lib/snipeit/data/private_uploads" "/var/www/html/storage/private_uploads" \
+      && rm -rf "/var/www/html/public/uploads" && ln -fs "/var/lib/snipeit/data/uploads" "/var/www/html/public/uploads" \
+      && rm -r "/var/www/html/storage/app/backups" && ln -fs "/var/lib/snipeit/dumps" "/var/www/html/storage/app/backups" \
+      && mkdir -p "/var/lib/snipeit/keys" && ln -fs "/var/lib/snipeit/keys/oauth-private.key" "/var/www/html/storage/oauth-private.key" \
+      && ln -fs "/var/lib/snipeit/keys/oauth-public.key" "/var/www/html/storage/oauth-public.key" \
+      && chown docker "/var/lib/snipeit/keys/" \
+      && chmod +x /var/www/html/artisan \
+      && mkdir "/var/www/temp" && chown docker "/var/www/temp" \ #added
+      && echo "Finished setting up application in /var/www/html"
+
+docker build -t plgabw/snipeit:4.x-dev .
