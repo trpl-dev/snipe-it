@@ -110,9 +110,11 @@
         <div class="label_qr">
             <img src="/qr/{{ $asset->id }}/qr_code" class="qr_img">
         </div>
-        @if ($settings->qr_text!='')
         <div>
+            @if ($settings->qr_text!='')
             <div class="label_title">{{ $settings->qr_text }}</div>
+            @endif
+        
         	<div class="qr_text">
             @if (($settings->labels_display_company_name=='1') && ($asset->company))
             <div
@@ -137,6 +139,7 @@
                 {{ $asset->asset_tag }} </br>
             </div>
             @endif
+
             @if (($settings->labels_display_serial=='1') && ($asset->serial!=''))
             <div>
                 SN: {{ $asset->serial }} </br>
@@ -144,7 +147,6 @@
            	 @endif
         </div>
 	</div>
-        @endif
 
         @if ((($settings->alt_barcode_enabled=='1') && $settings->alt_barcode!=''))
         <div class="barcode_container">
