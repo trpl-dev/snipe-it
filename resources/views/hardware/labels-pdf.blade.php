@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,9 +8,11 @@
 
 <body>
     <?php
+use const ParagonIE\ConstantTime\false;
+
         // debug mode toggeling borders to view boxes
-        $debug = true;
-        
+        $debug = false;
+
         // how many labels to print per page
         $labels_per_page = $settings->labels_per_page;
 
@@ -23,15 +26,15 @@
         $page_margin_top = $settings->labels_pmargin_top;
         $page_margin_bottom = $settings->labels_pmargin_bottom;
 
-        // width/ height of label in inches, 
+        // width/ height of label in inches,
         $label_width = $settings->labels_width;
         $label_height = $settings->labels_height;
-        // 1 per page implies: 
+        // 1 per page implies:
         // page_width = labels_width + pmargin_left + pmargin_right
         // page_height = labels_hight + pmargin_top + pmargin_bottom
-        $label_width = ($labels_per_page == 1 ? 
+        $label_width = ($labels_per_page == 1 ?
                             $page_width - $page_margin_left - $page_margin_right: $label_width);
-        $label_height =($labels_per_page == 1 ? 
+        $label_height =($labels_per_page == 1 ?
                             $page_height - $page_margin_top - $page_margin_bottom: $label_height);
 
         // space b(elow) and to the s(ide) of labels in inches
@@ -41,19 +44,19 @@
 
         // max. front size within label in pt
         $fontsize = $settings->labels_fontsize;
-        
+
         // text set by admin barcode settings (QR Code Text)
         $label_title = $settings->qr_text;
-        
+
         // leave space on bottom for 1D barcode if necessary
         // value between 0..1 in terms of parts of label width
-        $qr_size = ($settings->alt_barcode_enabled=='1') && ($settings->alt_barcode!='') 
-                        ? 0.45 : 0.9;
+        $qr_size = ($settings->alt_barcode_enabled=='1') && ($settings->alt_barcode!='')
+                        ? $label_height * 0.45 : $label_height * 0.9;
 
         // Leave space on left for QR code if necessary
         // value between 0..1 in terms of parts of label width
-        $qr_txt_size = ($settings->qr_code=='1' 
-                            ? 1 - $qr_size - 0.05 : 0.9);
+        $text_width = ($settings->qr_code=='1'
+                            ? 0.95 * ( $label_width - $qr_size) : $label_width);
     ?>
     <style>
         @page {
@@ -65,51 +68,52 @@
         }
         .label {
             position: relative;
-            left: 0in; 
-            width: {{ $label_width }}in; 
+            left: 0in;
+            width: {{ $label_width }}in;
             height: {{ $label_height }}in;
             font-size: {{ $fontsize }}pt;
             font-family: arial, helvetica, sans-serif;
         }
 
         .qr_img {
-            display: inline-block; 
-            position: absolute; 
-            left: 0px; 
-            height: {{ $label_height *0.2 }}in;
+            height: {{ $qr_size}}in;
+            width: {{ $qr_size }}in;
+            float: left;
+            display: inline-block;
         }
 
         .textfield {
-            display: inline-block; 
-            position: absolute; 
-            right:0px;
-            max-width: 45%;
-            height: {{ $label_height *0.2 }}in;
-            word-break: break-all;
-            overflow: hidden;
+            float: right;
+            width: {{ $text_width }}in;
+            max-height: {{ $qr_size}}in;
         }
 
         .qr_text {
+            float: right;
             font-weight: bold;
-            max-height: 2em;
-            overflow: hidden;
+            height: 0.1in;
+            overflow: hidden !important;
+            word-wrap: break-word;
+            word-break: break-all;
         }
 
         .asset_property {
-            max-height: 2em;
-            overflow: hidden;
+            word-break: break-all;
+            max-height: 20px !important;
+            overflow: hidden !important;
+            text-overflow: clip;
+            display: inline-block;
         }
 
-        .barcode_img {
-            position: absolute; 
-            top: calc({{ $label_height}}in - 1em - 3em);
-            width: {{ $label_width}}in;
-            max-heigth: 3em;
-            clip: rect(0px, {{ $label_width}}in, 3em, 0px);
+        .barcode {
+            height: {{ $qr_size*0.50 }}in;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .asset_tag {
-            position: absolute; 
+            position: absolute;
             top: calc({{ $label_height}}in - 1em);
             width: {{ $label_width}}in;
             text-align: center;
@@ -119,7 +123,7 @@
 
         <!-- debug mode toggeling borders to view boxes -->
         @if ($debug)
-            .label * { 
+            img {
                 border: 1px solid #900;
             }
         @endif
@@ -131,7 +135,10 @@
 
     @foreach ($assets as $asset)
         <div class="label">
-            <img src="/qr/{{ $asset->id }}/qr_code" class="qr_img">
+         <div>
+            <div class="qr_img">
+                <img src="/qr/{{ $asset->id }}/qr_code">
+            </div>
 
             <div class="textfield">
                 @if ($settings->qr_text!='')
@@ -139,32 +146,25 @@
                 @endif
 
                 @if (($settings->labels_display_company_name=='1') && ($asset->company))
-                    <div class="asset_property">
-                        C: {{ $asset->company->name }} </br>
-                    </div>
+                    <div class="asset_property">C: {{ $asset->company->name }}</div>
                 @endif
 
                 @if (($settings->labels_display_model=='1') && ($asset->model->name!=''))
-                    <div div class="asset_property">
-                        {{ $asset->model->manufacturer->name }} {{ $asset->model->name }} </br>
-                    </div>
+                    <div div class="asset_property">{{ $asset->model->manufacturer->name }} {{ $asset->model->name }}</div>
                 @endif
 
                 @if (($settings->labels_display_name=='1') && ($asset->name!=''))
-                    <div div class="asset_property">
-                        N: {{ $asset->name }} </br>
-                    </div>
+                    <div div class="asset_property">N: {{ $asset->name }}</div>
                 @endif
 
                 @if (($settings->labels_display_serial=='1') && ($asset->serial!=''))
-                    <div>
-                        SN: {{ $asset->serial }} </br>
-                    </div>
+                    <div class="asset_property">SN: {{ $asset->serial }}</div>
                 @endif
             </div>
-
+          </div>
+            <div>
             @if ((($settings->alt_barcode_enabled=='1') && $settings->alt_barcode!=''))
-                <img src="/qr/{{ $asset->id }}/barcode" class="barcode_img">
+                <img src="/qr/{{ $asset->id }}/barcode" class="barcode">
             @endif
 
             @if (($settings->labels_display_tag=='1') && ($asset->asset_tag!=''))
@@ -172,6 +172,7 @@
                     {{ $asset->asset_tag }} </br>
                 </div>
             @endif
+            </div>
         </div>
 
         @if ($loop->remaining > 0)
