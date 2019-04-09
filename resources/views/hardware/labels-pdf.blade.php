@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,7 +7,6 @@
 
 <body>
     <?php
-use const ParagonIE\ConstantTime\false;
 
         // debug mode toggeling borders to view boxes
         $debug = false;
@@ -48,10 +46,10 @@ use const ParagonIE\ConstantTime\false;
         // text set by admin barcode settings (QR Code Text)
         $label_title = $settings->qr_text;
 
-        // leave space on bottom for 1D barcode if necessary
+        // leave space on bottom for 1D barcode if necessarya
         // value between 0..1 in terms of parts of label width
         $qr_size = ($settings->alt_barcode_enabled=='1') && ($settings->alt_barcode!='')
-                        ? $label_height * 0.45 : $label_height * 0.9;
+                        ? $label_height * 0.40 : $label_height * 0.9;
 
         // Leave space on left for QR code if necessary
         // value between 0..1 in terms of parts of label width
@@ -106,10 +104,9 @@ use const ParagonIE\ConstantTime\false;
         }
 
         .barcode {
-            height: {{ $qr_size*0.50 }}in;
+            height: {{ $qr_size*1.0 }}in;
             display: block;
-            margin-left: auto;
-            margin-right: auto;
+            margin-left: 0.02in;
         }
 
         .asset_tag {
@@ -162,7 +159,7 @@ use const ParagonIE\ConstantTime\false;
                 @endif
             </div>
           </div>
-            <div>
+            <div style="min-width: $qr_size">
             @if ((($settings->alt_barcode_enabled=='1') && $settings->alt_barcode!=''))
                 <img src="/qr/{{ $asset->id }}/barcode" class="barcode">
             @endif
