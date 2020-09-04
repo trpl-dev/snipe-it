@@ -42,7 +42,7 @@
     "jquery.iframe-transport": "^1.0.0",
     "less": "less/less.js#efa6eb5306f28a7ef7e235d79ce854b780345591",
     "less-loader": "^4.1.0",
-    "papaparse": "^4.3.3",
+    "papaparse": "^5.2.0",
     "select2": "^4.0.5",
     "tableexport.jquery.plugin": "^1.9.15",
     "tether": "^1.4.0",
